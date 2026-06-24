@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.taftideh.mabda.archive",
+    "sha256_cert_fingerprints": ["0C:B0:FA:EA:4D:89:F5:65:E1:65:68:C7:C6:B9:F3:5A:2F:83:99:8C:0E:A3:CA:52:E0:50:DB:0A:F7:72:4C:EA"]
+  }
+}]
