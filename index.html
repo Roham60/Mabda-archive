@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#009999">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="logo.png">
+
+<title>MABDA TECHNICAL</title>
+
+<!-- ═══════════ کتابخانه‌های محلی (آفلاین) ═══════════ -->
+<script src="qrcode.min.js"></script>
+<script src="jspdf.umd.min.js"></script>
+<script src="xlsx.full.min.js"></script>
+<script src="html2canvas.min.js"></script>
+<script src="html5-qrcode.min.js"></script>
+
+<style>
+/* ===== تمام استایل‌های قبلی ===== */
+:root{--p:#009999;--pd:#007777;--s:#4D4D4D;--bg:#f0f6f6;--card:#fff;--border:#cce8e8;--success:#28a745;--warn:#e6a817;--danger:#dc3545;--light:#e0f5f5;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:Tahoma,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--s);min-height:100vh;padding-bottom:72px;}
+
+#splash{position:fixed;inset:0;background:#2d2d2d;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 1s ease;}
+#splash.hide{opacity:0;pointer-events:none;}
+#splash img{width:200px;height:auto;opacity:0;animation:spl-img 1s ease 0.3s forwards;filter:drop-shadow(0 4px 16px rgba(0,153,153,0.5));}
+#spl-title{color:var(--p);font-size:20px;font-weight:700;letter-spacing:4px;margin-top:20px;opacity:0;animation:spl-up 0.8s ease 1s forwards;}
+#spl-sub{color:#bbb;font-size:13px;margin-top:8px;min-height:22px;text-align:center;}
+@keyframes spl-img{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
+@keyframes spl-up{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+
+.hdr{background:var(--s);padding:6px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.25);}
+.hdr img{height:28px;object-fit:contain;border-radius:6px;cursor:pointer;}
+.hdr img:hover{opacity:0.8;}
+.hdr-mid{display:flex;flex-direction:column;align-items:center;}
+.hdr-mid span:first-child{color:var(--p);font-size:11px;font-weight:700;letter-spacing:2px;}
+.hdr-mid span:last-child{color:#aaa;font-size:8px;letter-spacing:1px;}
+.hdr-count{color:#aaa;font-size:10px;}
+
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--s);display:flex;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,0.2);height:60px;overflow-x:auto;}
+.bnav::-webkit-scrollbar{height:0;}
+.nb{flex:0 0 auto;padding:4px 6px;border:none;background:none;color:#888;font-size:7px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color 0.2s;font-family:inherit;min-width:48px;}
+.nb svg{width:18px;height:18px;fill:#888;transition:fill 0.2s;}
+.nb.active{color:var(--p);}
+.nb.active svg{fill:var(--p);}
+.nb:hover{color:var(--p);}
+.nb:hover svg{fill:var(--p);}
+
+.nb-more{position:relative;}
+.nb-more .badge{position:absolute;top:-2px;right:-2px;background:var(--p);color:#fff;border-radius:50%;width:14px;height:14px;font-size:7px;display:flex;align-items:center;justify-content:center;}
+
+@media (min-width: 768px){
+  .bnav{height:64px;}
+  .bnav .nb{flex:1 !important;min-width:0 !important;padding:4px 2px;font-size:8px;}
+  .bnav .nb svg{width:22px;height:22px;}
+  .bnav .nb-more{display:none !important;}
+  .nav-more-dropdown{display:none !important;}
+  .nav-more-overlay{display:none !important;}
+}
+@media (max-width: 767px) and (orientation: landscape){
+  .bnav{height:60px;}
+  .bnav .nb{flex:1 !important;min-width:0 !important;padding:4px 2px;font-size:7px;}
+  .bnav .nb svg{width:20px;height:20px;}
+  .bnav .nb-more{display:none !important;}
+  .nav-more-dropdown{display:none !important;}
+  .nav-more-overlay{display:none !important;}
+}
+@media (max-width: 767px) and (orientation: portrait){
+  .bnav{height:62px;}
+  .bnav .nb{display:none !important;}
+  .bnav .nb-main{display:flex !important;flex:1 !important;min-width:0 !important;justify-content:center;padding:4px 2px;font-size:7px;}
+  .bnav .nb-main svg{width:20px;height:20px;}
+  .bnav .nb-more{display:flex !important;flex:0 0 55px !important;font-size:7px;}
+  .bnav .nb-more svg{width:20px;height:20px;}
+}
+
+.nav-more-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:99;}
+.nav-more-overlay.show{display:block;animation:fadeIn 0.3s ease;}
+
+.nav-more-dropdown{display:none;position:fixed;bottom:62px;left:0;right:0;background:var(--s);border-radius:16px 16px 0 0;z-index:100;padding:8px 0 16px 0;box-shadow:0 -8px 30px rgba(0,0,0,0.4);border-top:2px solid var(--p);transform:translateY(100%);transition:all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);max-height:70vh;overflow-y:auto;}
+.nav-more-dropdown.show{display:block;transform:translateY(0);}
+.nav-more-dropdown .more-list{display:flex;flex-direction:column;gap:2px;padding:4px 12px;}
+.nav-more-dropdown .more-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border:none;background:none;color:#888;font-size:11px;font-family:inherit;cursor:pointer;border-radius:8px;transition:all 0.2s;width:100%;text-align:right;}
+.nav-more-dropdown .more-item svg{width:22px;height:22px;fill:#888;transition:all 0.2s;flex-shrink:0;}
+.nav-more-dropdown .more-item:hover{background:rgba(0,153,153,0.15);color:var(--p);}
+.nav-more-dropdown .more-item:hover svg{fill:var(--p);}
+.nav-more-dropdown .more-item.active{color:var(--p);background:rgba(0,153,153,0.12);}
+.nav-more-dropdown .more-item.active svg{fill:var(--p);}
+.nav-more-dropdown .more-divider{height:1px;background:rgba(255,255,255,0.08);margin:4px 12px;}
+
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes slideUpMore{from{transform:translateY(100%);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.nav-more-dropdown.show{animation:slideUpMore 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);}
+
+.page{display:none;padding:8px;padding-bottom:10px;}
+.page.active{display:block;}
+
+.card{background:var(--card);border-radius:10px;padding:10px;box-shadow:0 2px 6px rgba(0,153,153,0.08);margin-bottom:8px;border:1px solid var(--border);}
+.ctitle{font-size:12px;font-weight:700;color:var(--p);margin-bottom:6px;padding-bottom:4px;border-bottom:2px solid var(--light);display:flex;align-items:center;gap:5px;}
+
+.sgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:8px;}
+.sbox{background:var(--card);border-radius:8px;padding:6px 2px;text-align:center;border:1px solid var(--border);cursor:pointer;transition:all 0.2s;}
+.sbox:hover{background:var(--light);}
+.snum{font-size:16px;font-weight:700;color:var(--p);}
+.slbl{font-size:7px;color:#777;margin-top:2px;}
+
+.fg{margin-bottom:6px;}
+label{font-size:9px;color:#555;margin-bottom:2px;display:block;font-weight:600;}
+.req{color:var(--danger);}
+input,select,textarea{width:100%;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:10px;font-family:inherit;background:#fafefe;transition:border 0.2s;outline:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--p);}
+input[readonly]{background:var(--light);color:#555;}
+textarea{resize:vertical;min-height:40px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+
+.btn{padding:6px 12px;border:none;border-radius:6px;font-size:10px;cursor:pointer;font-family:inherit;font-weight:600;transition:all 0.2s;display:inline-flex;align-items:center;gap:3px;}
+.btn:active{transform:scale(0.95);}
+.bp{background:var(--p);color:#fff;}
+.bp:hover{background:var(--pd);}
+.bs{background:var(--s);color:#fff;}
+.bsc{background:var(--success);color:#fff;}
+.bd{background:var(--danger);color:#fff;}
+.bw{background:var(--warn);color:#333;}
+.bo{background:transparent;border:2px solid var(--p);color:var(--p);}
+.bsm{padding:3px 6px;font-size:9px;}
+.bbl{width:100%;justify-content:center;margin-bottom:4px;}
+.brow{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;}
+
+.main-menu{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;}
+.main-menu .menu-btn{flex:1;min-width:55px;padding:5px 4px;border:none;border-radius:6px;font-size:7px;cursor:pointer;font-family:inherit;font-weight:600;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--card);border:1px solid var(--border);color:var(--s);}
+.main-menu .menu-btn svg{width:14px;height:14px;fill:#888;transition:fill 0.2s;}
+.main-menu .menu-btn:hover{background:var(--light);border-color:var(--p);color:var(--p);}
+.main-menu .menu-btn:hover svg{fill:#888;}
+.main-menu .menu-btn:active{transform:scale(0.95);}
+.main-menu .menu-btn.bp{background:var(--p);color:#fff;border-color:var(--p);}
+.main-menu .menu-btn.bp svg{fill:#fff;}
+.main-menu .menu-btn.bp:hover{background:var(--pd);}
+
+.cbrow{display:flex;gap:10px;align-items:center;margin:4px 0;flex-wrap:wrap;}
+.cbi{display:flex;align-items:center;gap:3px;cursor:pointer;font-size:10px;}
+.cbi input{width:14px;height:14px;accent-color:var(--p);}
+
+.twrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:9px;}
+th{background:var(--p);color:#fff;padding:5px 4px;text-align:right;white-space:nowrap;}
+td{padding:4px 4px;border-bottom:1px solid var(--border);vertical-align:middle;cursor:pointer;}
+tr:hover td{background:var(--light);}
+.bdg{padding:1px 5px;border-radius:20px;font-size:7px;font-weight:600;white-space:nowrap;}
+.bg-g{background:#d4edda;color:#155724;}
+.bg-r{background:#f8d7da;color:#721c24;}
+.bg-y{background:#fff3cd;color:#856404;}
+.bg-b{background:#d1ecf1;color:#0c5460;}
+.bg-p{background:#e0f5f5;color:#005555;}
+
+.dropdown-btn{background:none;border:none;cursor:pointer;padding:4px 8px;font-size:18px;font-weight:bold;color:var(--s);border-radius:4px;transition:background 0.2s;}
+.dropdown-btn:hover{background:var(--light);color:var(--p);}
+.dropdown-btn:active{transform:scale(0.85);}
+.dropdown-content{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.9);background:#fff;min-width:220px;max-width:92%;box-shadow:0 12px 40px rgba(0,0,0,0.35);border-radius:16px;border:1px solid var(--border);z-index:999;padding:6px 0;opacity:0;transition:all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);}
+.dropdown-content.show{display:block;opacity:1;transform:translate(-50%,-50%) scale(1);}
+@keyframes menuPop{from{opacity:0;transform:translate(-50%,-50%) scale(0.8);}to{opacity:1;transform:translate(-50%,-50%) scale(1);}}
+.dropdown-content.show{animation:menuPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);}
+.dropdown-content a{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:12px;color:var(--s);text-decoration:none;cursor:pointer;transition:all 0.15s;border:none;background:none;width:100%;font-family:inherit;text-align:right;border-bottom:1px solid #f5f5f5;}
+.dropdown-content a:last-child{border-bottom:none;}
+.dropdown-content a:hover{background:var(--light);color:var(--p);padding-right:20px;}
+.dropdown-content a.danger{color:var(--danger);}
+.dropdown-content a.danger:hover{background:#f8d7da;color:#721c24;}
+.dropdown-content a .icon{font-size:16px;width:24px;text-align:center;}
+.dropdown-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:998;}
+.dropdown-overlay.show{display:block;animation:fadeIn 0.3s ease;}
+
+.alert{padding:6px 10px;border-radius:6px;margin-bottom:6px;font-size:10px;border-right:4px solid;}
+.aw{background:#fff3cd;border-color:var(--warn);color:#856404;}
+.ad{background:#f8d7da;border-color:var(--danger);color:#721c24;}
+.as{background:#d4edda;border-color:var(--success);color:#155724;}
+.ai{background:var(--light);border-color:var(--p);color:#005555;}
+
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:8px;overflow-x:auto;}
+.tab{padding:5px 10px;cursor:pointer;font-size:10px;color:#777;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all 0.2s;font-family:inherit;background:none;border-top:none;border-left:none;border-right:none;}
+.tab.active{color:var(--p);border-bottom-color:var(--p);font-weight:600;}
+
+.sbar{display:flex;gap:3px;margin-bottom:6px;}
+.sbar input{flex:1;}
+.pwrap{background:var(--border);border-radius:20px;height:5px;overflow:hidden;margin-top:2px;}
+.pbar{height:100%;background:var(--p);border-radius:20px;transition:width 0.5s;}
+
+.map-shelf{background:var(--card);border-radius:10px;border:2px solid var(--border);overflow:hidden;margin-bottom:10px;}
+.map-shelf-hdr{background:var(--p);color:#fff;padding:5px 8px;font-weight:700;font-size:11px;display:flex;justify-content:space-between;align-items:center;}
+.map-section{padding:6px 8px;border-bottom:1px solid var(--border);}
+.map-sec-title{font-size:9px;color:var(--s);font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:5px;}
+.map-row{display:flex;gap:2px;align-items:flex-end;margin-bottom:2px;}
+.map-col-lbl{font-size:6px;color:#bbb;width:16px;text-align:center;flex-shrink:0;margin-bottom:1px;}
+.slot{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--border);background:var(--light);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;font-size:5px;color:transparent;flex-shrink:0;}
+.slot.occ{background:var(--p);border-color:var(--pd);color:#fff;}
+.slot.warn{background:var(--warn);border-color:#c49000;color:#fff;}
+.slot.occ:hover{background:var(--pd);}
+.slot.warn:hover{background:#d4a000;}
+.slot:hover{background:#b2dfdf;}
+.slot:active{transform:scale(0.85);}
+.map-legend{display:flex;gap:12px;font-size:8px;margin:4px 0 8px 0;flex-wrap:wrap;padding:4px 6px;background:var(--light);border-radius:6px;}
+.map-legend span{display:flex;align-items:center;gap:4px;}
+.map-legend .dot{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid #ccc;}
+
+.moverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;align-items:flex-end;justify-content:center;}
+.moverlay.open{display:flex;}
+.modal{background:#fff;border-radius:16px 16px 0 0;padding:14px;width:100%;max-height:85vh;overflow-y:auto;animation:slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);}
+@keyframes slideUp{from{transform:translateY(100%);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.mtitle{font-size:13px;font-weight:700;color:var(--p);margin-bottom:10px;}
+.mclose{float:left;background:none;border:none;font-size:18px;cursor:pointer;color:#777;padding:0;}
+
+#qr-reader{width:100%;max-height:320px;border-radius:8px;border:2px solid var(--p);background:#000;overflow:hidden;}
+.qr-result-txt{text-align:center;margin-top:6px;color:var(--p);font-weight:600;font-size:11px;}
+
+.ftxt{position:fixed;bottom:60px;left:0;right:0;text-align:center;font-size:7px;color:#999;background:rgba(240,246,246,0.98);padding:4px 2px;letter-spacing:1px;z-index:50;border-top:1px solid rgba(0,0,0,0.05);line-height:1.4;}
+
+.credit{text-align:center;font-size:8px;color:#aaa;padding:4px 0;border-top:1px solid var(--border);margin-top:8px;}
+.credit strong{color:var(--p);}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--p);border-radius:4px;}
+
+/* استایل صفحه پاک کردن کش */
+.clear-box{background:#fff;border-radius:10px;padding:16px;border:1px solid var(--border);margin-bottom:8px;}
+.clear-box h3{color:var(--p);font-size:13px;margin-bottom:8px;}
+.clear-box p{font-size:10px;color:#666;line-height:1.8;margin-bottom:10px;}
+.clear-status{background:var(--light);border-radius:8px;padding:12px;margin:12px 0;font-size:11px;color:#005555;text-align:center;white-space:pre-line;}
+.clear-status.error{background:#f8d7da;color:#721c24;}
+.clear-status.success{background:#d4edda;color:#155724;}
+.clear-btn{display:block;width:100%;padding:12px;margin:6px 0;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:inherit;}
+.clear-btn:active{transform:scale(0.96);}
+.clear-btn.primary{background:var(--p);color:#fff;}
+.clear-btn.primary:hover{background:var(--pd);}
+.clear-btn.danger{background:var(--danger);color:#fff;}
+.clear-btn.danger:hover{background:#c82333;}
+.clear-btn.success{background:var(--success);color:#fff;}
+.clear-btn.success:hover{background:#1e7e34;}
+.clear-btn.outline{background:transparent;border:2px solid var(--p);color:var(--p);}
+.clear-btn.outline:hover{background:var(--p);color:#fff;}
+.clear-btn.secondary{background:#6c757d;color:#fff;}
+.clear-btn.secondary:hover{background:#5a6268;}
+.clear-hr{border:none;border-top:2px solid var(--border);margin:12px 0;}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <img src="logo.png" alt="MABDA" id="splash-logo" onerror="this.style.display='none'">
+  <div id="spl-title">MABDA TECHNICAL</div>
+  <div id="spl-sub"></div>
+</div>
+
+<header class="hdr">
+  <img src="logo.png" alt="MABDA" onclick="goPg('pg-dash')" onerror="this.style.display='none'">
+  <div class="hdr-mid">
+    <span>MABDA TECHNICAL</span>
+    <span>بخش فنی و مهندسی مبدا</span>
+  </div>
+  <div class="hdr-count" id="hdr-count">۰ نمونه</div>
+</header>
+
+<!-- ===== صفحات ===== -->
+<div class="page active" id="pg-dash">
+  <div class="sgrid">
+    <div class="sbox" onclick="goPg('pg-list')"><div class="snum" id="st-total">0</div><div class="slbl">کل نمونه‌ها</div></div>
+    <div class="sbox" onclick="goPg('pg-map')"><div class="snum" style="color:var(--warn)" id="st-warn">0</div><div class="slbl">هشدار خروج</div></div>
+    <div class="sbox" onclick="goPg('pg-arch')"><div class="snum" style="color:#777" id="st-arch">0</div><div class="slbl">خروج موقت</div></div>
+    <div class="sbox" onclick="goPg('pg-send')"><div class="snum" style="color:var(--p)" id="st-send">0</div><div class="slbl">ارسال‌ها</div></div>
+    <div class="sbox" onclick="goPg('pg-deleted')"><div class="snum" style="color:var(--danger)" id="st-del">0</div><div class="slbl">حذف‌شده</div></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">📊 ظرفیت بایگانی</div>
+    <div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:2px;">
+      <span id="cap-txt">۰ از ۹۸۰</span><span id="cap-pct">۰٪</span>
+    </div>
+    <div class="pwrap"><div class="pbar" id="cap-bar" style="width:0%"></div></div>
+  </div>
+  <div id="dash-alerts"></div>
+  
+  <div class="card">
+    <div class="ctitle">📋 منوی اصلی</div>
+    <div class="main-menu">
+      <button class="menu-btn bp" onclick="goPg('pg-new')"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>ثبت</button>
+      <button class="menu-btn" onclick="goPg('pg-list')"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>لیست</button>
+      <button class="menu-btn" onclick="goPg('pg-search')"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>جستجو</button>
+      <button class="menu-btn" onclick="goPg('pg-map')"><svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>نقشه</button>
+      <button class="menu-btn" onclick="goPg('pg-arch')"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v3.01c0 .72.43 1.34 1 1.72V20c0 1.1 1.1 2 2 2h14c.9 0 2-.9 2-2V8.72c.57-.38 1-1 1-1.72V4c0-1.1-.9-2-2-2zm-5 12H9v-2h6v2zm5-7H4V4l16-.02V7z"/></svg>خروج موقت</button>
+      <button class="menu-btn" onclick="goPg('pg-send')"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>ارسال</button>
+      <button class="menu-btn" onclick="goPg('pg-move-list')"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>جابجایی</button>
+      <button class="menu-btn" onclick="goPg('pg-deleted')"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>حذف‌شده</button>
+      <button class="menu-btn" onclick="goPg('pg-set')"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>تنظیمات</button>
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="ctitle">🕐 آخرین نمونه‌ها</div>
+    <div id="recent-list"><div style="text-align:center;color:#bbb;padding:12px;font-size:10px;">هنوز نمونه‌ای ثبت نشده</div></div>
+  </div>
+</div>
+
+<!-- ===== بقیه صفحات (همان کد قبلی) ===== -->
+<div class="page" id="pg-new">
+  <div class="card">
+    <div class="ctitle">➕ ثبت نمونه جدید</div>
+    <div class="g2">
+      <div class="fg"><label>کد نمونه (خودکار)</label><input type="text" id="f-code" readonly></div>
+      <div class="fg"><label>کد موقعیت</label><input type="text" id="f-loccode" placeholder="A-K1-1-1" oninput="parseLocCode()"></div>
+    </div>
+    <div style="background:var(--light);border-radius:8px;padding:6px;margin-bottom:6px;">
+      <div style="font-size:9px;font-weight:700;color:var(--p);margin-bottom:4px;">📍 انتخاب موقعیت</div>
+      <div class="g2">
+        <div class="fg"><label>قفسه</label><select id="f-shelf" onchange="onShelfChange()"><option value="">انتخاب...</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select></div>
+        <div class="fg"><label>بخش</label><select id="f-sec" onchange="onSecChange()"><option value="">انتخاب...</option></select></div>
+        <div class="fg"><label>ستون</label><select id="f-col" onchange="buildLocCode()"><option value="">انتخاب...</option></select></div>
+        <div class="fg"><label>ردیف</label><select id="f-row" onchange="buildLocCode()"><option value="">انتخاب...</option></select></div>
+      </div>
+    </div>
+    <div class="fg"><label>محل نمونه‌برداری <span class="req">*</span></label><input type="text" id="f-loc" placeholder="نام محل" oninput="autoName()"></div>
+    <div class="fg"><label>نام دپو <span class="req">*</span></label><input type="text" id="f-depot" placeholder="نام دپو" oninput="autoName()"></div>
+    <div class="g2"><div class="fg"><label>شروع دپو <span class="req">*</span></label><input type="text" id="f-ds" placeholder="۱۴۰۳/۰۱/۰۱" oninput="autoName()"></div><div class="fg"><label>پایان دپو</label><input type="text" id="f-de" placeholder="۱۴۰۳/۰۳/۳۱" oninput="autoName()"></div></div>
+    <div class="fg"><label>تاریخ نمونه‌برداری</label><input type="text" id="f-dsample" placeholder="۱۴۰۳/۰۲/۱۵"></div>
+    <div class="fg"><label>نام نمونه</label><input type="text" id="f-name" placeholder="خودکار"></div>
+    <div class="fg"><label>تاریخ ورود</label><input type="text" id="f-entry"></div>
+    <div class="fg"><label>توضیحات</label><textarea id="f-notes" placeholder="یادداشت..."></textarea></div>
+    <div class="cbrow"><label class="cbi"><input type="checkbox" id="f-lab"> آزمایشگاهی</label><label class="cbi"><input type="checkbox" id="f-ind"> صنعتی</label></div>
+    <div class="brow"><button class="btn bp" onclick="saveSample()">💾 ثبت</button><button class="btn bs" onclick="doPrint(null, null, null, true)">🖨️ پرینت</button><button class="btn bo" onclick="clearForm()">🗑️ پاک</button></div>
+  </div>
+</div>
+
+<!-- ===== صفحه لیست ===== -->
+<div class="page" id="pg-list">
+  <div class="card">
+    <div class="ctitle">🔽 فیلتر</div>
+    <div class="g2"><div class="fg"><label>قفسه</label><select id="fl-shelf" onchange="renderList()"><option value="">همه</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select></div><div class="fg"><label>نوع تست</label><select id="fl-test" onchange="renderList()"><option value="">همه</option><option value="lab">آزمایشگاهی</option><option value="ind">صنعتی</option></select></div></div>
+    <div class="sbar"><input type="text" id="fl-q" placeholder="جستجو..." oninput="renderList()"><button class="btn bo bsm" onclick="openScan('list-search')">📷</button></div>
+  </div>
+  <div class="card"><div class="ctitle">📋 نمونه‌ها (<span id="list-cnt">0</span>)</div><div class="twrap"><table><thead><tr><th>کد</th><th>نام</th><th>موقعیت</th><th>ورود</th><th>تست</th><th>عملیات</th></tr></thead><tbody id="list-tbody"></tbody></table></div></div>
+</div>
+
+<!-- ===== صفحه جستجو ===== -->
+<div class="page" id="pg-search">
+  <div class="tabs"><button class="tab active" onclick="swTab(this,'ts-code')">🔍 کد / نام</button><button class="tab" onclick="swTab(this,'ts-loc')">📍 موقعیت</button></div>
+  <div id="ts-code"><div class="card"><div class="ctitle">جستجو بر اساس کد یا نام</div><div class="sbar"><input type="text" id="s-code" placeholder="کد، نام، محل..." oninput="searchCode()" style="flex:1;"><button class="btn bo bsm" onclick="openScan('s-code')">📷</button></div><div id="sr-code"></div></div></div>
+  <div id="ts-loc" style="display:none"><div class="card"><div class="ctitle">جستجو بر اساس موقعیت</div><div class="sbar"><input type="text" id="s-loc" placeholder="A-K1-1-1" oninput="searchLoc()" style="flex:1;"><button class="btn bo bsm" onclick="openScan('s-loc')">📷</button></div><div class="g2" style="margin-bottom:4px;"><select id="sl-sh" onchange="searchLoc()"><option value="">همه</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select><select id="sl-sec" onchange="searchLoc()"><option value="">همه</option><option value="TD">طبقه پایین</option><option value="K1">کشو ۱</option><option value="K2">کشو ۲</option><option value="K3">کشو ۳</option><option value="TU">طبقه بالا</option></select></div><div id="sr-loc"></div></div></div>
+</div>
+
+<!-- ===== صفحه نقشه ===== -->
+<div class="page" id="pg-map">
+  <div class="card" style="padding:6px 8px;">
+    <div class="ctitle">🗺️ نقشه بایگانی</div>
+    <div class="map-legend">
+      <span><span class="dot" style="background:var(--p);border-color:var(--pd);"></span> اشغال عادی</span>
+      <span><span class="dot" style="background:var(--warn);border-color:#c49000;"></span> نزدیک به خروج (≤۵ روز)</span>
+      <span><span class="dot" style="background:var(--light);border-color:#ccc;"></span> خالی</span>
+    </div>
+    <div id="map-area"></div>
+  </div>
+</div>
+
+<!-- ===== صفحه خروج موقت ===== -->
+<div class="page" id="pg-arch">
+  <div class="card"><div class="ctitle">📤 خروج موقت</div>
+    <div class="sbar"><input type="text" id="aq" placeholder="جستجو..." oninput="renderArch()"><button class="btn bo bsm" onclick="openScan('arch-search')">📷</button></div>
+    <div class="twrap"><table><thead><tr><th>کد</th><th>نام</th><th>موقعیت</th><th>طبقه</th><th>تاریخ</th><th>عملیات</th></tr></thead><tbody id="arch-ex-tb"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ===== صفحه ارسال ===== -->
+<div class="page" id="pg-send">
+  <div class="card"><div class="ctitle">📤 ارسال نمونه</div><div class="fg"><label>کد نمونه</label><div class="sbar"><input type="text" id="send-code" placeholder="کد نمونه..." oninput="findSendSample()" style="flex:1;"><button class="btn bo bsm" onclick="openScan('send-code')">📷</button></div></div><div id="send-sample-info" style="display:none"><div class="alert ai" id="send-info-txt"></div><div class="fg"><label>ارسال به</label><input type="text" id="send-to" placeholder="نام واحد..."></div><div class="cbrow"><label class="cbi"><input type="checkbox" id="send-lab" onchange="toggleSendLab()"> آزمایشگاه</label></div><div class="fg" id="send-lab-field" style="display:none"><label>نام آزمایشگاه</label><input type="text" id="send-lab-name" placeholder="نام آزمایشگاه..."></div><div class="fg"><label>تاریخ ارسال</label><input type="text" id="send-date"></div><div class="fg"><label>توضیحات</label><textarea id="send-notes" placeholder="یادداشت..."></textarea></div><div class="cbrow"><label class="cbi"><input type="checkbox" id="send-all"> ارسال کل (حذف از بایگانی)</label></div><div class="brow"><button class="btn bp" onclick="doSend()">📤 ثبت ارسال</button></div></div></div>
+  <div class="card"><div class="ctitle">📦 رکورد ارسال‌ها</div><div class="sbar"><input type="text" id="send-search" placeholder="جستجو..." oninput="renderSends()"><button class="btn bo bsm" onclick="openScan('send-search-scan')">📷</button></div><div class="twrap"><table><thead><tr><th>کد</th><th>نام</th><th>ارسال به</th><th>تاریخ</th><th>نوع</th><th>کل؟</th></tr></thead><tbody id="send-tb"></tbody></table></div></div>
+</div>
+
+<!-- ===== صفحه جابجایی ===== -->
+<div class="page" id="pg-move-list">
+  <div class="card"><div class="ctitle">↔️ تاریخچه جابجایی</div>
+    <div class="sbar"><input type="text" id="move-search" placeholder="جستجو..." oninput="renderMoveList()"><button class="btn bo bsm" onclick="openScan('move-search')">📷</button></div>
+    <div class="twrap"><table><thead><tr><th>کد</th><th>نام</th><th>موقعیت فعلی</th><th>تعداد جابجایی</th><th>آخرین حرکت</th></tr></thead><tbody id="move-tb"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ===== صفحه حذف‌شده ===== -->
+<div class="page" id="pg-deleted">
+  <div class="card"><div class="ctitle">🗑️ نمونه‌های حذف‌شده</div>
+    <div class="sbar"><input type="text" id="del-search" placeholder="جستجو..." oninput="renderDeleted()"><button class="btn bo bsm" onclick="openScan('del-search')">📷</button></div>
+    <div class="twrap"><table><thead><tr><th>کد</th><th>نام</th><th>موقعیت</th><th>طبقه خروج</th><th>تاریخ حذف</th></tr></thead><tbody id="del-tb"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ===== صفحه تنظیمات ===== -->
+<div class="page" id="pg-set">
+  <div class="card"><div class="ctitle">⚙️ تنظیمات</div>
+    <div class="fg"><label>نام شرکت</label><input type="text" id="set-co" value="MABDA TECHNICAL"></div>
+    <div class="fg"><label>هشدار خروج (روز)</label><input type="number" id="set-days" value="30" min="1" max="365"></div>
+    <button class="btn bp bbl" onclick="saveSettings()">💾 ذخیره</button>
+    <div class="clear-hr"></div>
+    <button class="clear-btn primary" onclick="goPg('pg-clear-cache')">🧹 پاک کردن کش و حافظه</button>
+  </div>
+  <div class="card"><div class="ctitle">📊 Import / Export</div><button class="btn bsc bbl" onclick="exportExcel()">📥 Export Excel</button><button class="btn bo bbl" onclick="dlTemplate()">📋 فرم خالی</button><button class="btn bo bbl" onclick="document.getElementById('imp-xl').click()">📤 Import Excel</button><input type="file" id="imp-xl" accept=".xlsx,.xls" style="display:none" onchange="importExcel(this)"><div style="height:1px;background:var(--border);margin:4px 0;"></div><button class="btn bs bbl" onclick="exportDB()">💾 Backup</button><button class="btn bo bbl" onclick="document.getElementById('imp-db').click()">♻️ Restore</button><input type="file" id="imp-db" accept=".json" style="display:none" onchange="importDB(this)"></div>
+  <div class="card"><div class="ctitle">🏗️ ساختار قفسه‌ها</div><div id="shelf-struct"></div></div>
+  <div class="card" style="border-color:var(--p);background:var(--light);"><div class="credit">طراحی و اجرا: <strong>علی تفتیده</strong></div></div>
+</div>
+
+<!-- ===== صفحه پاک کردن کش ===== -->
+<div class="page" id="pg-clear-cache">
+  <div class="card">
+    <div class="ctitle">🧹 پاک کردن کش و حافظه</div>
+    <p style="font-size:11px;color:#666;line-height:1.8;margin-bottom:8px;">
+      این ابزار برای پاک کردن اطلاعات ذخیره‌شده در مرورگر برنامه MABDA TECHNICAL طراحی شده است.
+    </p>
+    <div class="clear-status" id="clear-status">⏳ آماده...</div>
+    <button class="clear-btn primary" onclick="clearLocalStorage()">🗑️ پاک کردن localStorage (دیتابیس)</button>
+    <button class="clear-btn danger" onclick="clearAll()">🔄 پاک کردن همه چیز (localStorage + Cache + Cookies + Service Worker)</button>
+    <div class="clear-hr"></div>
+    <button class="clear-btn success" onclick="showClearInfo()">📊 نمایش اطلاعات ذخیره‌شده</button>
+    <button class="clear-btn outline" onclick="goPg('pg-set')">🏠 بازگشت به تنظیمات</button>
+    <div class="clear-hr"></div>
+    <button class="clear-btn secondary" onclick="hardReset()">⚠️ ریست کامل (حتماً Backup بگیرید)</button>
+  </div>
+</div>
+
+<!-- ===== منوی پایین ===== -->
+<nav class="bnav">
+  <button class="nb nb-main" onclick="goPg('pg-dash',this)"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>داشبورد</button>
+  <button class="nb nb-main" onclick="goPg('pg-new',this)"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s10 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>ثبت</button>
+  <button class="nb nb-main" onclick="goPg('pg-list',this)"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>لیست</button>
+  <button class="nb nb-main" onclick="goPg('pg-map',this)"><svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>نقشه</button>
+  
+  <button class="nb nb-more" onclick="toggleMoreMenu(event)">
+    <svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+    بیشتر
+    <span class="badge">●</span>
+  </button>
+
+  <button class="nb" onclick="goPg('pg-arch',this)"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v3.01c0 .72.43 1.34 1 1.72V20c0 1.1 1.1 2 2 2h14c.9 0 2-.9 2-2V8.72c.57-.38 1-1 1-1.72V4c0-1.1-.9-2-2-2zm-5 12H9v-2h6v2zm5-7H4V4l16-.02V7z"/></svg>خروج موقت</button>
+  <button class="nb" onclick="goPg('pg-send',this)"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>ارسال</button>
+  <button class="nb" onclick="goPg('pg-move-list',this)"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>جابجایی</button>
+  <button class="nb" onclick="goPg('pg-deleted',this)"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>حذف‌شده</button>
+  <button class="nb" onclick="goPg('pg-set',this)"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>تنظیمات</button>
+</nav>
+
+<div class="nav-more-overlay" id="nav-more-overlay" onclick="closeMoreMenu()"></div>
+<div class="nav-more-dropdown" id="nav-more-dropdown">
+  <div class="more-list">
+    <button class="more-item" onclick="goMore('pg-arch')"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v3.01c0 .72.43 1.34 1 1.72V20c0 1.1 1.1 2 2 2h14c.9 0 2-.9 2-2V8.72c.57-.38 1-1 1-1.72V4c0-1.1-.9-2-2-2zm-5 12H9v-2h6v2zm5-7H4V4l16-.02V7z"/></svg>خروج موقت</button>
+    <button class="more-item" onclick="goMore('pg-send')"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>ارسال</button>
+    <button class="more-item" onclick="goMore('pg-move-list')"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>جابجایی</button>
+    <button class="more-item" onclick="goMore('pg-deleted')"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>حذف‌شده</button>
+    <button class="more-item" onclick="goMore('pg-set')"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>تنظیمات</button>
+  </div>
+</div>
+
+<div class="ftxt">MABDA GROUP · بخش فنی و مهندسی مبدا</div>
+
+<!-- ===== مودال‌ها ===== -->
+<div class="moverlay" id="qr-modal">
+  <div class="modal">
+    <button class="mclose" onclick="closeScan()">✕</button>
+    <div class="mtitle">📷 اسکن QR</div>
+    <div id="qr-reader"></div>
+    <div class="qr-result-txt" id="qr-rtxt">📷 دکمه شروع اسکن</div>
+    <button class="btn bp bbl" style="margin-top:6px;" onclick="startCam()">📷 شروع اسکن</button>
+    <button class="btn bo bbl" onclick="closeScan()">❌ بستن</button>
+  </div>
+</div>
+
+<div class="moverlay" id="det-modal">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal('det-modal')">✕</button>
+    <div class="mtitle">جزئیات نمونه</div>
+    <div id="det-content"></div>
+  </div>
+</div>
+
+<div class="moverlay" id="move-modal">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal('move-modal')">✕</button>
+    <div class="mtitle">↔️ جابجایی</div>
+    <div id="move-content"></div>
+  </div>
+</div>
+
+<div class="moverlay" id="exit-modal">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal('exit-modal')">✕</button>
+    <div class="mtitle">📤 خروج موقت</div>
+    <div id="exit-content"></div>
+  </div>
+</div>
+
+<div class="moverlay" id="return-modal">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal('return-modal')">✕</button>
+    <div class="mtitle">↩️ بازگشت به قفسه</div>
+    <div id="return-content"></div>
+  </div>
+</div>
+
+<div class="moverlay" id="print-modal" style="align-items:center;justify-content:center;">
+  <div id="print-popup" style="background:#fff;border-radius:14px;padding:10px;display:inline-flex;flex-direction:column;align-items:center;width:fit-content;box-shadow:0 12px 48px rgba(0,0,0,0.4);direction:rtl;">
+    <div style="font-size:11px;font-weight:700;color:var(--p);margin-bottom:8px;width:100%;text-align:center;">🖨️ پیش‌نمایش لیبل</div>
+    <div id="label-row" style="display:flex;flex-direction:row;align-items:center;gap:10px;">
+      <div id="label-preview" style="width:378px;height:151px;border:2.5px solid var(--p);border-radius:6px;background:#fff;display:flex;flex-direction:row;align-items:center;justify-content:space-between;padding:6px 8px;overflow:hidden;flex-shrink:0;user-select:none;">
+        <div id="label-qr-sample" style="width:94px;height:94px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;"></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:4px 8px;gap:4px;overflow:hidden;font-family:Tahoma,Arial,sans-serif;">
+          <div style="color:var(--p);font-weight:900;font-size:14px;letter-spacing:3px;border-bottom:2px solid var(--p);padding-bottom:2px;width:100%;text-align:center;">MABDA</div>
+          <div id="lbl-line2" style="font-size:9px;font-weight:700;color:#222;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;"></div>
+          <div id="lbl-line3" style="font-size:8px;color:#555;text-align:center;border-bottom:1px dashed #ccc;padding-bottom:3px;width:100%;"></div>
+          <div style="display:flex;justify-content:space-around;width:100%;font-size:8px;font-family:Tahoma,Arial,sans-serif;">
+            <div>کد: <span id="lbl-code" style="color:var(--p);font-weight:700;"></span></div>
+            <div>موقعیت: <span id="lbl-loc" style="color:#444;font-weight:700;"></span></div>
+          </div>
+        </div>
+        <div id="label-qr-loc" style="width:94px;height:94px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;"></div>
+      </div>
+      <div style="display:flex;flex-direction:row;gap:8px;align-items:center;flex-shrink:0;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <div style="width:132px;height:132px;border-radius:50%;border:2.5px solid #333;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fff;">
+            <div id="r-qr-loc" style="width:110px;height:110px;display:flex;align-items:center;justify-content:center;overflow:hidden;"></div>
+          </div>
+          <span style="font-size:8px;color:#444;font-weight:700;font-family:Tahoma,Arial,sans-serif;">Loc.</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <div style="width:132px;height:132px;border-radius:50%;border:2.5px solid #333;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fff;">
+            <div id="r-qr-code" style="width:110px;height:110px;display:flex;align-items:center;justify-content:center;overflow:hidden;"></div>
+          </div>
+          <span style="font-size:8px;color:#444;font-weight:700;font-family:Tahoma,Arial,sans-serif;">Sam.</span>
+        </div>
+      </div>
+    </div>
+    <div class="brow" style="justify-content:center;margin-top:10px;width:100%;">
+      <button class="btn bp" onclick="confirmPrint()">✅ تأیید و دانلود PDF</button>
+      <button class="btn bs" onclick="closeModal('print-modal')">❌ انصراف</button>
+    </div>
+  </div>
+</div>
+
+<div class="dropdown-overlay" id="dropdown-overlay" onclick="closeAllDropdowns()"></div>
+
+<script>
+// ===== تمام کدهای جاوااسکریپت قبلی (با همان توابع) =====
+const SHELVES = {
+  A:{TD:{c:2,r:4},K1:{c:6,r:6},K2:{c:6,r:6},K3:{c:6,r:6},TU:{c:2,r:8}},
+  B:{TD:{c:2,r:4},K1:{c:6,r:6},K2:{c:6,r:6},K3:{c:6,r:6},TU:{c:2,r:8}},
+  C:{TD:{c:2,r:4},K1:{c:9,r:5},K2:{c:10,r:6},K3:{c:10,r:6},TU:{c:2,r:8}},
+  D:{TD:{c:2,r:4},K1:{c:10,r:6},K2:{c:10,r:6},K3:{c:10,r:6},TU:{c:2,r:8}},
+  E:{TD:{c:2,r:4},K1:{c:8,r:6},K2:{c:8,r:6},K3:{c:8,r:6},TU:{c:2,r:8}},
+  F:{TD:{c:2,r:4},K1:{c:7,r:5},K2:{c:8,r:6},K3:{c:8,r:6},TU:{c:2,r:8}}
+};
+const SLBL={TD:'طبقه پایین',K1:'کشو ۱',K2:'کشو ۲',K3:'کشو ۳',TU:'طبقه بالا'};
+const TOTAL_CAPACITY = 980;
+
+let db={samples:[],archived:[],deleted:[],sends:[],settings:{warnDays:30,company:'MABDA TECHNICAL'}};
+let sc=1;
+let scanTarget='';
+let movingId=null;
+let exitId=null;
+let returnId=null;
+let printingSample = null;
+
+function loadDB(){try{const d=localStorage.getItem('mabda2_db');if(d){db=JSON.parse(d);sc=db.samples.length+db.archived.length+db.deleted.length+1;}}catch(e){}}
+function saveDB(){try{localStorage.setItem('mabda2_db',JSON.stringify(db));}catch(e){}}
+function now(){const n=new Date();return n.toLocaleDateString('fa-IR')+' '+n.toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'});}
+function genCode(){return 'SMB-'+String(sc).padStart(4,'0')+'-'+Date.now().toString(36).toUpperCase().slice(-4);}
+
+// ===== توابع پاک کردن کش =====
+function setClearStatus(msg, type){
+  const el = document.getElementById('clear-status');
+  el.textContent = msg;
+  el.className = 'clear-status';
+  if(type) el.classList.add(type);
+}
+
+function clearLocalStorage(){
+  try {
+    localStorage.removeItem('mabda2_db');
+    setClearStatus('✅ localStorage (دیتابیس) پاک شد', 'success');
+  } catch(e) {
+    setClearStatus('❌ خطا: '+e.message, 'error');
+  }
+}
+
+async function unregisterServiceWorkers() {
+  if ('serviceWorker' in navigator) {
+    try {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      if (registrations.length > 0) {
+        for (let registration of registrations) {
+          await registration.unregister();
+        }
+        return true;
+      }
+      return true;
+    } catch (e) {
+      console.error('Error unregistering Service Workers:', e);
+      return false;
+    }
+  }
+  return true;
+}
+
+async function clearAll(){
+  if(!confirm('آیا مطمئن هستید؟ همه اطلاعات ذخیره‌شده پاک می‌شود!')) {
+    setClearStatus('⏳ عملیات لغو شد');
+    return;
+  }
+  try {
+    localStorage.clear();
+    sessionStorage.clear();
+    document.cookie.split(";").forEach(function(c) { 
+      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+    });
+    if('caches' in window){
+      const cacheKeys = await caches.keys();
+      await Promise.all(cacheKeys.map(key => caches.delete(key)));
+    }
+    await unregisterServiceWorkers();
+    setClearStatus('✅ همه چیز پاک شد! (localStorage + Cache + Cookies + Service Worker)', 'success');
+  } catch(e) {
+    setClearStatus('❌ خطا: '+e.message, 'error');
+  }
+}
+
+function showClearInfo(){
+  try {
+    const data = localStorage.getItem('mabda2_db');
+    if(data){
+      const parsed = JSON.parse(data);
+      const count = {
+        samples: parsed.samples?.length || 0,
+        archived: parsed.archived?.length || 0,
+        deleted: parsed.deleted?.length || 0,
+        sends: parsed.sends?.length || 0
+      };
+      setClearStatus(
+        '📊 اطلاعات فعلی:\n' +
+        'نمونه‌ها: '+count.samples+' | ' +
+        'خروج موقت: '+count.archived+' | ' +
+        'حذف‌شده: '+count.deleted+' | ' +
+        'ارسال‌ها: '+count.sends,
+        'success'
+      );
+    } else {
+      setClearStatus('📭 هیچ اطلاعاتی در localStorage یافت نشد', 'success');
+    }
+  } catch(e) {
+    setClearStatus('❌ خطا در خواندن اطلاعات: '+e.message, 'error');
+  }
+}
+
+async function hardReset(){
+  if(!confirm('⚠️ هشدار! این کار همه اطلاعات را برای همیشه پاک می‌کند.\nحتماً از اطلاعات خود Backup گرفته‌اید؟')){
+    setClearStatus('⏳ عملیات لغو شد');
+    return;
+  }
+  if(!confirm('تأیید نهایی: آیا مطمئن هستید؟')){
+    setClearStatus('⏳ عملیات لغو شد');
+    return;
+  }
+  await clearAll();
+  setClearStatus('🔄 ریست کامل انجام شد. صفحه در ۳ ثانیه بازآوری می‌شود...', 'success');
+  setTimeout(() => {
+    location.reload();
+  }, 3000);
+}
+
+// ===== بقیه توابع برنامه (همان کدهای قبلی) =====
+function toggleMoreMenu(event){
+  if(event)event.stopPropagation();
+  const menu=document.getElementById('nav-more-dropdown');
+  const overlay=document.getElementById('nav-more-overlay');
+  if(menu.classList.contains('show')){
+    closeMoreMenu();
+  }else{
+    menu.classList.add('show');
+    overlay.classList.add('show');
+  }
+}
+function closeMoreMenu(){
+  document.getElementById('nav-more-dropdown').classList.remove('show');
+  document.getElementById('nav-more-overlay').classList.remove('show');
+}
+function goMore(id){
+  closeMoreMenu();
+  goPg(id);
+}
+
+function goPg(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById(id);
+  if(el)el.classList.add('active');
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.querySelectorAll('.more-item').forEach(b=>b.classList.remove('active'));
+  const map={
+    'pg-dash':'pg-dash','pg-new':'pg-new','pg-list':'pg-list','pg-map':'pg-map',
+    'pg-arch':'pg-arch','pg-send':'pg-send','pg-move-list':'pg-move-list','pg-deleted':'pg-deleted','pg-set':'pg-set','pg-clear-cache':'pg-clear-cache'
+  };
+  const target=map[id];
+  if(target){
+    document.querySelectorAll('.more-item').forEach(b=>{
+      if(b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+target+"'")){
+        b.classList.add('active');
+      }
+    });
+  }
+  if(id==='pg-dash')updDash();
+  if(id==='pg-list')renderList();
+  if(id==='pg-map')renderMap();
+  if(id==='pg-arch')renderArch();
+  if(id==='pg-send'){renderSends();document.getElementById('send-date').value=now();}
+  if(id==='pg-set')renderShelfStruct();
+  if(id==='pg-new')initForm();
+  if(id==='pg-move-list')renderMoveList();
+  if(id==='pg-deleted')renderDeleted();
+  if(id==='pg-clear-cache'){showClearInfo();}
+  closeAllDropdowns();
+  closeMoreMenu();
+}
+
+function swTab(el,tid){
+  const par=el.closest('.page')||el.parentElement.parentElement;
+  par.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  par.querySelectorAll('[id^="t"]').forEach(t=>{if(t.id.startsWith('t')&&t.tagName==='DIV')t.style.display='none';});
+  const tgt=document.getElementById(tid);if(tgt)tgt.style.display='block';
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+function updDash(){
+  const tot=db.samples.length, arch=db.archived.length;
+  document.getElementById('st-total').textContent=tot;
+  document.getElementById('st-arch').textContent=arch;
+  document.getElementById('st-send').textContent=db.sends.length;
+  document.getElementById('st-del').textContent=db.deleted.length;
+  document.getElementById('hdr-count').textContent=tot+' نمونه';
+  const pct=Math.round((tot/TOTAL_CAPACITY)*100);
+  document.getElementById('cap-txt').textContent=tot+' از '+TOTAL_CAPACITY;
+  document.getElementById('cap-pct').textContent=pct+'٪';
+  document.getElementById('cap-bar').style.width=pct+'%';
+  const wd=db.settings.warnDays||30;
+  const warns=db.samples.filter(s=>{
+    if(!s.exitDate)return false;
+    const d=new Date(s.exitDate.replace(/[۰-۹]/g,c=>String.fromCharCode(c.charCodeAt(0)-1728))).getTime();
+    return (d-Date.now())/86400000<=wd;
+  });
+  document.getElementById('st-warn').textContent=warns.length;
+  const aa=document.getElementById('dash-alerts');
+  aa.innerHTML=warns.length?'<div class="alert aw">⚠️ '+warns.length+' نمونه نزدیک موعد خروج</div>':'';
+  const recent=db.samples.slice(-5).reverse();
+  const rl=document.getElementById('recent-list');
+  if(!recent.length){rl.innerHTML='<div style="text-align:center;color:#bbb;padding:12px;font-size:10px;">هنوز نمونه‌ای ثبت نشده</div>';return;}
+  rl.innerHTML=recent.map(s=>
+    '<div style="padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:9px;cursor:pointer;" onclick="showDet('+s.id+')">'+
+      '<div><strong style="color:var(--p)">'+s.code+'</strong><br><span style="color:#666">'+s.name+'</span></div>'+
+      '<div style="display:flex;align-items:center;gap:4px;"><span class="bdg bg-b">'+s.locCode+'</span></div>'+
+    '</div>'
+  ).join('');
+}
+
+function initForm(){
+  document.getElementById('f-code').value=genCode();
+  document.getElementById('f-entry').value=now();
+  ['f-loccode','f-loc','f-depot','f-ds','f-de','f-dsample','f-name','f-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-lab').checked=false;
+  document.getElementById('f-ind').checked=false;
+  document.getElementById('f-shelf').value='';
+  document.getElementById('f-sec').innerHTML='<option value="">انتخاب...</option>';
+  document.getElementById('f-col').innerHTML='<option value="">انتخاب...</option>';
+  document.getElementById('f-row').innerHTML='<option value="">انتخاب...</option>';
+}
+function onShelfChange(){
+  const sh=document.getElementById('f-shelf').value;
+  const sec=document.getElementById('f-sec');
+  sec.innerHTML='<option value="">انتخاب...</option>';
+  document.getElementById('f-col').innerHTML='<option value="">انتخاب...</option>';
+  document.getElementById('f-row').innerHTML='<option value="">انتخاب...</option>';
+  if(!sh)return;
+  Object.keys(SHELVES[sh]).forEach(k=>sec.innerHTML+='<option value="'+k+'">'+SLBL[k]+'</option>');
+  buildLocCode();
+}
+function onSecChange(){
+  const sh=document.getElementById('f-shelf').value;
+  const sec=document.getElementById('f-sec').value;
+  const colS=document.getElementById('f-col'), rowS=document.getElementById('f-row');
+  colS.innerHTML='<option value="">انتخاب...</option>';rowS.innerHTML='<option value="">انتخاب...</option>';
+  if(!sh||!sec)return;
+  const d=SHELVES[sh][sec];
+  for(let c=1;c<=d.c;c++)colS.innerHTML+='<option value="'+c+'">ستون '+c+'</option>';
+  for(let r=1;r<=d.r;r++)rowS.innerHTML+='<option value="'+r+'">ردیف '+r+'</option>';
+  buildLocCode();
+}
+function buildLocCode(){
+  const sh=document.getElementById('f-shelf').value;
+  const sec=document.getElementById('f-sec').value;
+  const col=document.getElementById('f-col').value;
+  const row=document.getElementById('f-row').value;
+  if(sh&&sec&&col&&row)document.getElementById('f-loccode').value=sh+'-'+sec+'-'+col+'-'+row;
+}
+function parseLocCode(){
+  const v=document.getElementById('f-loccode').value.trim();
+  const p=v.split('-');
+  if(p.length===4){
+    const sh=p[0].toUpperCase(), sec=p[1].toUpperCase();
+    if(SHELVES[sh]&&SHELVES[sh][sec]){
+      document.getElementById('f-shelf').value=sh;
+      onShelfChange();
+      setTimeout(()=>{
+        document.getElementById('f-sec').value=sec;
+        onSecChange();
+        setTimeout(()=>{document.getElementById('f-col').value=p[2];document.getElementById('f-row').value=p[3];},50);
+      },50);
+    }
+  }
+}
+function autoName(){
+  const loc=document.getElementById('f-loc').value.trim();
+  const dep=document.getElementById('f-depot').value.trim();
+  const ds=document.getElementById('f-ds').value.trim();
+  const de=document.getElementById('f-de').value.trim();
+  if(loc||dep||ds){
+    let n='';
+    if(loc) n+=loc;
+    if(dep) n+=(n?' - ':'')+dep;
+    if(ds) n+=(n?' از ':'از ')+ds;
+    if(de) n+=' الی '+de;
+    document.getElementById('f-name').value=n;
+  }
+}
+function clearForm(){initForm();}
+function saveSample(){
+  const loc=document.getElementById('f-loc').value.trim();
+  const dep=document.getElementById('f-depot').value.trim();
+  const ds=document.getElementById('f-ds').value.trim();
+  if(!loc||!dep||!ds){alert('فیلدهای اجباری: محل، دپو، تاریخ شروع');return;}
+  const lc=document.getElementById('f-loccode').value.trim();
+  if(!lc){alert('موقعیت قفسه را انتخاب کنید');return;}
+  if(db.samples.find(s=>s.locCode===lc)&&!confirm('موقعیت '+lc+' اشغال است. ادامه؟'))return;
+  const s={
+    id:Date.now(),code:document.getElementById('f-code').value,locCode:lc,
+    location:loc,depot:dep,dateStart:ds,dateEnd:document.getElementById('f-de').value.trim(),
+    dateSample:document.getElementById('f-dsample').value.trim(),
+    name:document.getElementById('f-name').value.trim()||(loc+' - '+dep+' از '+ds),
+    entryDate:document.getElementById('f-entry').value,
+    notes:document.getElementById('f-notes').value.trim(),
+    labTest:document.getElementById('f-lab').checked,
+    indTest:document.getElementById('f-ind').checked,
+    exitFloor:'',
+    status:'active',
+    movementHistory:[]
+  };
+  db.samples.push(s);sc++;saveDB();
+  alert('✅ نمونه ثبت شد\nکد: '+s.code+'\nموقعیت: '+s.locCode);
+  if(confirm('لیبل پرینت شود؟'))doPrint(s);
+  clearForm();updDash();
+}
+
+function renderList(){
+  const q=(document.getElementById('fl-q').value||'').toLowerCase();
+  const sh=document.getElementById('fl-shelf').value;
+  const ts=document.getElementById('fl-test').value;
+  let items=db.samples.filter(s=>{
+    if(sh&&!s.locCode.startsWith(sh))return false;
+    if(ts==='lab'&&!s.labTest)return false;
+    if(ts==='ind'&&!s.indTest)return false;
+    if(q&&!s.code.toLowerCase().includes(q)&&!s.name.toLowerCase().includes(q)&&!s.location.toLowerCase().includes(q))return false;
+    return true;
+  });
+  document.getElementById('list-cnt').textContent=items.length;
+  const tb=document.getElementById('list-tbody');
+  if(!items.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#bbb;padding:12px">موردی یافت نشد</td></tr>';return;}
+  tb.innerHTML=items.map(s=>'<tr onclick="showDet('+s.id+')">'+
+    '<td><span style="color:var(--p);font-weight:600;font-size:8px">'+s.code+'</span></td>'+
+    '<td style="max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+s.name+'">'+s.name+'</td>'+
+    '<td><span class="bdg bg-b">'+s.locCode+'</span></td>'+
+    '<td style="font-size:8px">'+s.entryDate+'</td>'+
+    '<td>'+(s.labTest?'<span class="bdg bg-g">آز</span>':'')+(s.indTest?'<span class="bdg bg-y">صن</span>':'')+'</td>'+
+    '<td><button class="dropdown-btn" onclick="event.stopPropagation();toggleDropdown(event, '+s.id+', \''+s.code+'\')">⋮</button></td></tr>'
+  ).join('');
+}
+
+function toggleDropdown(event, id, code){
+  event.stopPropagation();
+  closeAllDropdowns();
+  const menu = document.createElement('div');
+  menu.className = 'dropdown-content show';
+  menu.innerHTML = `
+    <a onclick="showDet(${id});closeAllDropdowns();"><span class="icon">👁</span> جزئیات</a>
+    <a onclick="openMove(${id});closeAllDropdowns();"><span class="icon">↔</span> جابجایی</a>
+    <a onclick="openExitModal(${id});closeAllDropdowns();"><span class="icon">📤</span> خروج موقت</a>
+    <a onclick="goToSendFromList('${code}');closeAllDropdowns();"><span class="icon">📤</span> ارسال</a>
+    <a onclick="doPrint(null,${id});closeAllDropdowns();"><span class="icon">🖨</span> پرینت</a>
+    <a class="danger" onclick="delS(${id});closeAllDropdowns();"><span class="icon">🗑</span> حذف</a>
+  `;
+  document.body.appendChild(menu);
+  document.getElementById('dropdown-overlay').classList.add('show');
+}
+
+function closeAllDropdowns(){
+  document.querySelectorAll('.dropdown-content').forEach(el=>el.remove());
+  document.getElementById('dropdown-overlay').classList.remove('show');
+}
+
+function showDet(id){
+  const s = db.samples.find(x=>x.id===id) || db.archived.find(x=>x.id===id) || db.deleted.find(x=>x.id===id);
+  if(!s) return;
+  let historyHtml = '';
+  if(s.movementHistory && s.movementHistory.length){
+    historyHtml = '<div style="margin-top:6px;font-size:9px;color:#555;border-top:1px dashed #ccc;padding-top:4px;"><span style="font-weight:700;color:var(--p);">📋 تاریخچه حرکت:</span><br>'+
+      s.movementHistory.map(m => '• '+ (m.type==='move'?'جابجایی':m.type==='exit'?'خروج موقت':m.type==='return'?'بازگشت':'حذف') +' از '+m.from+' → '+(m.to||'خروج')+' ('+m.date+')'+(m.note?': '+m.note:'')).join('<br>')+
+    '</div>';
+  }
+  let btns = '<button class="btn bo bsm" onclick="doPrint(null,'+id+')">🖨️ پرینت</button>'+
+             '<button class="btn bp bsm" onclick="goToSend(\''+s.code+'\');closeModal(\'det-modal\')">📤 ارسال</button>';
+  
+  if(s.status === 'active'){
+    btns += '<button class="btn bs bsm" onclick="openMove('+id+');closeModal(\'det-modal\')">↔ جابجایی</button>'+
+            '<button class="btn bw bsm" onclick="openExitModal('+id+');closeModal(\'det-modal\')">📤 خروج موقت</button>'+
+            '<button class="btn bd bsm" onclick="delS('+id+');closeModal(\'det-modal\')">🗑 حذف</button>';
+  } else if(s.status === 'exited'){
+    btns += '<button class="btn bs bsm" onclick="openReturnModal('+id+');closeModal(\'det-modal\')">↩️ بازگشت به قفسه</button>'+
+            '<button class="btn bd bsm" onclick="delArchived('+id+');closeModal(\'det-modal\')">🗑 حذف</button>';
+  } else if(s.status === 'deleted'){
+    btns = '<button class="btn bo bsm" onclick="doPrint(null,'+id+')">🖨️ پرینت</button>';
+  }
+  
+  document.getElementById('det-content').innerHTML =
+    '<table style="width:100%;font-size:10px;">'+
+    row2('کد نمونه','<strong style="color:var(--p)">'+s.code+'</strong>')+
+    row2('کد موقعیت','<strong>'+s.locCode+'</strong>')+
+    row2('نام نمونه',s.name)+
+    row2('محل نمونه‌برداری',s.location)+
+    row2('نام دپو',s.depot)+
+    row2('شروع دپو',s.dateStart)+
+    row2('پایان دپو',s.dateEnd||'—')+
+    row2('تاریخ نمونه‌برداری',s.dateSample||'—')+
+    row2('تاریخ ورود',s.entryDate)+
+    row2('طبقه خروج موقت',s.exitFloor||'—')+
+    row2('تست آزمایشگاهی',s.labTest?'✅':'—')+
+    row2('تست صنعتی',s.indTest?'✅':'—')+
+    row2('توضیحات',s.notes||'—')+
+    '</table>'+
+    historyHtml+
+    '<div class="brow" style="margin-top:8px;">'+btns+'</div>';
+  document.getElementById('det-modal').classList.add('open');
+  closeAllDropdowns();
+}
+function row2(l,v){return'<tr><td style="color:#777;padding:3px 0;width:38%;font-size:9px">'+l+'</td><td style="font-size:9px">'+v+'</td></tr>';}
+
+function delArchived(id){
+  if(!confirm('حذف قطعی از بایگانی تأیید؟'))return;
+  const i=db.archived.findIndex(x=>x.id===id);
+  if(i===-1)return;
+  const s=db.archived.splice(i,1)[0];
+  s.deleteDate=now();
+  s.status='deleted';
+  s.movementHistory=s.movementHistory||[];
+  s.movementHistory.push({from:s.locCode,to:'حذف از بایگانی',date:now(),type:'delete'});
+  db.deleted.push(s);
+  saveDB();
+  renderArch();
+  updDash();
+}
+
+function goToSend(code){
+  goPg('pg-send');
+  document.getElementById('send-code').value=code;
+  findSendSample();
+}
+function goToSendFromList(code){
+  goPg('pg-send');
+  document.getElementById('send-code').value=code;
+  findSendSample();
+}
+
+function openMove(id){
+  movingId=id;
+  const s=db.samples.find(x=>x.id===id);
+  if(!s)return;
+  document.getElementById('move-content').innerHTML=
+    '<div class="alert ai" style="margin-bottom:6px">نمونه: <strong>'+s.code+'</strong><br>موقعیت فعلی: <strong>'+s.locCode+'</strong></div>'+
+    '<div class="fg"><label>موقعیت جدید</label><input type="text" id="mv-loc" placeholder="B-K1-2-3"></div>'+
+    '<div class="g2">'+
+    '<div class="fg"><label>قفسه</label><select id="mv-sh" onchange="mvShCh()"><option value="">انتخاب...</option>'+
+    ['A','B','C','D','E','F'].map(x=>'<option>'+x+'</option>').join('')+'</select></div>'+
+    '<div class="fg"><label>بخش</label><select id="mv-sec" onchange="mvSecCh()"><option value="">انتخاب...</option></select></div>'+
+    '<div class="fg"><label>ستون</label><select id="mv-col" onchange="mvBuild()"><option value="">انتخاب...</option></select></div>'+
+    '<div class="fg"><label>ردیف</label><select id="mv-row" onchange="mvBuild()"><option value="">انتخاب...</option></select></div>'+
+    '</div>'+
+    '<button class="btn bp bbl" onclick="doMove()">↔ تأیید جابجایی</button>';
+  document.getElementById('move-modal').classList.add('open');
+  closeAllDropdowns();
+}
+function mvShCh(){const sh=document.getElementById('mv-sh').value;const sec=document.getElementById('mv-sec');sec.innerHTML='<option value="">انتخاب...</option>';if(!sh)return;Object.keys(SHELVES[sh]).forEach(k=>sec.innerHTML+='<option value="'+k+'">'+SLBL[k]+'</option>');}
+function mvSecCh(){const sh=document.getElementById('mv-sh').value;const sec=document.getElementById('mv-sec').value;const c=document.getElementById('mv-col'),r=document.getElementById('mv-row');c.innerHTML='<option value="">انتخاب...</option>';r.innerHTML='<option value="">انتخاب...</option>';if(!sh||!sec)return;const d=SHELVES[sh][sec];for(let i=1;i<=d.c;i++)c.innerHTML+='<option value="'+i+'">ستون '+i+'</option>';for(let i=1;i<=d.r;i++)r.innerHTML+='<option value="'+i+'">ردیف '+i+'</option>';}
+function mvBuild(){const sh=document.getElementById('mv-sh').value;const sec=document.getElementById('mv-sec').value;const col=document.getElementById('mv-col').value;const row=document.getElementById('mv-row').value;if(sh&&sec&&col&&row)document.getElementById('mv-loc').value=sh+'-'+sec+'-'+col+'-'+row;}
+function doMove(){
+  const nl=document.getElementById('mv-loc').value.trim();
+  if(!nl){alert('موقعیت جدید را وارد کنید');return;}
+  const occ=db.samples.find(s=>s.locCode===nl&&s.id!==movingId);
+  if(occ&&!confirm('این موقعیت اشغال است. ادامه؟'))return;
+  const s=db.samples.find(x=>x.id===movingId);
+  if(s){
+    const oldLoc=s.locCode;
+    s.locCode=nl;
+    s.movementHistory=s.movementHistory||[];
+    s.movementHistory.push({from:oldLoc,to:nl,date:now(),type:'move'});
+    saveDB();
+    renderList();
+    closeModal('move-modal');
+    alert('✅ جابجا شد از '+oldLoc+' به '+nl);
+  }
+}
+
+function openExitModal(id){
+  exitId=id;
+  const s=db.samples.find(x=>x.id===id);
+  if(!s)return;
+  document.getElementById('exit-content').innerHTML=
+    '<div class="alert ai" style="margin-bottom:6px">نمونه: <strong>'+s.code+'</strong><br>موقعیت: <strong>'+s.locCode+'</strong></div>'+
+    '<div class="fg"><label>طبقه خروج موقت <span class="req">*</span></label>'+
+    '<select id="exit-floor"><option value="">انتخاب...</option>'+
+    ['1','2','3','4','5','6'].map(x=>'<option value="'+x+'">طبقه '+x+'</option>').join('')+
+    '</select></div>'+
+    '<button class="btn bp bbl" onclick="doExit()">📤 تأیید خروج موقت</button>';
+  document.getElementById('exit-modal').classList.add('open');
+  closeAllDropdowns();
+}
+function doExit(){
+  const floor=document.getElementById('exit-floor').value;
+  if(!floor){alert('طبقه خروج موقت را انتخاب کنید');return;}
+  const i=db.samples.findIndex(x=>x.id===exitId);
+  if(i===-1)return;
+  const s=db.samples.splice(i,1)[0];
+  s.exitDate=now();
+  s.exitFloor=floor;
+  s.status='exited';
+  s.movementHistory=s.movementHistory||[];
+  s.movementHistory.push({from:s.locCode,to:'خروج موقت',date:now(),type:'exit'});
+  db.archived.push(s);
+  saveDB();
+  renderList();
+  updDash();
+  closeModal('exit-modal');
+  alert('✅ نمونه خارج شد - طبقه '+floor);
+}
+
+function openReturnModal(id){
+  returnId=id;
+  const s=db.archived.find(x=>x.id===id);
+  if(!s)return;
+  document.getElementById('return-content').innerHTML=`
+    <div class="alert ai" style="margin-bottom:6px">نمونه: <strong>${s.code}</strong><br>موقعیت فعلی: <strong>${s.locCode}</strong></div>
+    <div class="fg"><label>موقعیت جدید (قفسه)</label>
+      <input type="text" id="return-loc" placeholder="B-K1-2-3">
+    </div>
+    <div class="g2">
+      <div class="fg"><label>قفسه</label><select id="return-sh" onchange="returnShCh()"><option value="">انتخاب...</option>
+      ${['A','B','C','D','E','F'].map(x=>'<option>'+x+'</option>').join('')}</select></div>
+      <div class="fg"><label>بخش</label><select id="return-sec" onchange="returnSecCh()"><option value="">انتخاب...</option></select></div>
+      <div class="fg"><label>ستون</label><select id="return-col" onchange="returnBuild()"><option value="">انتخاب...</option></select></div>
+      <div class="fg"><label>ردیف</label><select id="return-row" onchange="returnBuild()"><option value="">انتخاب...</option></select></div>
+    </div>
+    <div class="fg"><label>توضیحات (اختیاری)</label><textarea id="return-note" placeholder="دلیل بازگشت..."></textarea></div>
+    <button class="btn bp bbl" onclick="doReturn()">↩️ تأیید بازگشت</button>
+  `;
+  document.getElementById('return-modal').classList.add('open');
+  closeAllDropdowns();
+}
+
+function returnShCh(){
+  const sh=document.getElementById('return-sh').value;
+  const sec=document.getElementById('return-sec');
+  sec.innerHTML='<option value="">انتخاب...</option>';
+  if(!sh)return;
+  Object.keys(SHELVES[sh]).forEach(k=>sec.innerHTML+='<option value="'+k+'">'+SLBL[k]+'</option>');
+}
+function returnSecCh(){
+  const sh=document.getElementById('return-sh').value;
+  const sec=document.getElementById('return-sec').value;
+  const c=document.getElementById('return-col'), r=document.getElementById('return-row');
+  c.innerHTML='<option value="">انتخاب...</option>'; r.innerHTML='<option value="">انتخاب...</option>';
+  if(!sh||!sec)return;
+  const d=SHELVES[sh][sec];
+  for(let i=1;i<=d.c;i++) c.innerHTML+='<option value="'+i+'">ستون '+i+'</option>';
+  for(let i=1;i<=d.r;i++) r.innerHTML+='<option value="'+i+'">ردیف '+i+'</option>';
+}
+function returnBuild(){
+  const sh=document.getElementById('return-sh').value;
+  const sec=document.getElementById('return-sec').value;
+  const col=document.getElementById('return-col').value;
+  const row=document.getElementById('return-row').value;
+  if(sh&&sec&&col&&row) document.getElementById('return-loc').value=sh+'-'+sec+'-'+col+'-'+row;
+}
+
+function doReturn(){
+  const nl=document.getElementById('return-loc').value.trim();
+  if(!nl){ alert('موقعیت جدید را وارد کنید'); return; }
+  if(db.samples.find(s=>s.locCode===nl)) {
+    if(!confirm('این موقعیت در حال حاضر اشغال است. آیا ادامه می‌دهید؟')) return;
+  }
+  const idx=db.archived.findIndex(x=>x.id===returnId);
+  if(idx===-1) return;
+  const s=db.archived.splice(idx,1)[0];
+  s.status='active';
+  s.exitDate=null;
+  s.exitFloor='';
+  s.movementHistory=s.movementHistory||[];
+  s.movementHistory.push({
+    from: s.locCode,
+    to: nl,
+    date: now(),
+    type: 'return',
+    note: document.getElementById('return-note').value.trim() || 'بازگشت از خروج موقت'
+  });
+  s.locCode=nl;
+  db.samples.push(s);
+  saveDB();
+  renderArch();
+  updDash();
+  closeModal('return-modal');
+  alert('✅ نمونه با موفقیت به قفسه بازگشت داده شد.');
+}
+
+function delS(id){
+  if(!confirm('حذف قطعی تأیید؟'))return;
+  const i=db.samples.findIndex(x=>x.id===id);
+  if(i===-1)return;
+  const s=db.samples.splice(i,1)[0];
+  s.deleteDate=now();
+  s.status='deleted';
+  s.movementHistory=s.movementHistory||[];
+  s.movementHistory.push({from:s.locCode,to:'حذف',date:now(),type:'delete'});
+  db.deleted.push(s);
+  saveDB();
+  renderList();
+  updDash();
+}
+
+function searchCode(){const q=(document.getElementById('s-code').value||'').toLowerCase().trim();const el=document.getElementById('sr-code');if(!q){el.innerHTML='';return;}const found=db.samples.filter(s=>s.code.toLowerCase().includes(q)||s.name.toLowerCase().includes(q)||s.locCode.toLowerCase().includes(q));renderSR(el,found);}
+function searchLoc(){const q=(document.getElementById('s-loc').value||'').toLowerCase().trim();const sh=document.getElementById('sl-sh').value;const sec=document.getElementById('sl-sec').value;const el=document.getElementById('sr-loc');let found=db.samples.filter(s=>{if(sh&&!s.locCode.startsWith(sh))return false;if(sec&&!s.locCode.includes('-'+sec+'-'))return false;if(q&&!s.locCode.toLowerCase().includes(q))return false;return true;});renderSR(el,found);}
+function renderSR(el,items){if(!items.length){el.innerHTML='<div class="alert ai">موردی یافت نشد</div>';return;}el.innerHTML=items.map(s=>'<div class="card" style="margin-bottom:4px;padding:6px;cursor:pointer;" onclick="showDet('+s.id+')"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><div><strong style="color:var(--p);font-size:10px">'+s.code+'</strong><br><span style="font-size:9px">'+s.name+'</span><br><span class="bdg bg-b">'+s.locCode+'</span></div><button class="btn bo bsm" onclick="event.stopPropagation();showDet('+s.id+')">جزئیات</button></div></div>').join('');}
+
+function renderMap(){
+  const el=document.getElementById('map-area');el.innerHTML='';
+  Object.entries(SHELVES).forEach(([sh,secs])=>{
+    const tot=Object.values(secs).reduce((a,s)=>a+s.c*s.r,0);
+    const occ=db.samples.filter(s=>s.locCode.startsWith(sh+'-')).length;
+    const warnCount=db.samples.filter(s=>{
+      if(!s.locCode.startsWith(sh+'-'))return false;
+      if(!s.exitDate)return false;
+      const d=new Date(s.exitDate.replace(/[۰-۹]/g,c=>String.fromCharCode(c.charCodeAt(0)-1728))).getTime();
+      return (d-Date.now())/86400000<=5;
+    }).length;
+    const pct=Math.round((occ/tot)*100);
+    const div=document.createElement('div');div.className='map-shelf';
+    let html='<div class="map-shelf-hdr"><span>قفسه '+sh+'</span><span>'+occ+'/'+tot+' ('+pct+'%)'+(warnCount?' ⚠️'+warnCount:'')+'</span></div>';
+    Object.entries(secs).forEach(([sec,dim])=>{
+      html+='<div class="map-section"><div class="map-sec-title">'+SLBL[sec]+' <span style="color:#aaa;font-size:7px;font-weight:400">('+dim.c+'×'+dim.r+')</span></div>';
+      html+='<div class="map-row"><div style="width:18px;flex-shrink:0"></div>';
+      for(let c=1;c<=dim.c;c++)html+='<div class="map-col-lbl">'+c+'</div>';
+      html+='</div>';
+      for(let r=1;r<=dim.r;r++){
+        html+='<div class="map-row"><div style="font-size:7px;color:#aaa;width:18px;flex-shrink:0;line-height:16px;">ر'+r+'</div>';
+        for(let c=1;c<=dim.c;c++){
+          const lc=sh+'-'+sec+'-'+c+'-'+r;
+          const oc=db.samples.find(s=>s.locCode===lc);
+          let cls='slot';
+          let title=lc+': خالی';
+          if(oc){
+            let isWarn=false;
+            if(oc.exitDate){
+              const d=new Date(oc.exitDate.replace(/[۰-۹]/g,ch=>String.fromCharCode(ch.charCodeAt(0)-1728))).getTime();
+              if((d-Date.now())/86400000<=5)isWarn=true;
+            }
+            cls+=isWarn?' warn':' occ';
+            title=lc+': '+oc.code+(isWarn?' ⚠️نزدیک خروج':'');
+          }
+          html+='<div class="'+cls+'" title="'+title+'" onclick="slotClick(\''+lc+'\')">'+(oc?'●':'')+'</div>';
+        }
+        html+='</div>';
+      }
+      html+='</div>';
+    });
+    div.innerHTML=html;el.appendChild(div);
+  });
+}
+function fillFormFromLocCode(lc){goPg('pg-new');document.getElementById('f-loccode').value=lc;const parts=lc.split('-');if(parts.length!==4)return;const[sh,sec,col,row]=parts;document.getElementById('f-shelf').value=sh;onShelfChange();setTimeout(()=>{const secSelect=document.getElementById('f-sec');const secOption=Array.from(secSelect.options).find(opt=>opt.value===sec);if(secOption){secSelect.value=sec;onSecChange();setTimeout(()=>{const colSelect=document.getElementById('f-col'),rowSelect=document.getElementById('f-row');const colOption=Array.from(colSelect.options).find(opt=>opt.value===col);const rowOption=Array.from(rowSelect.options).find(opt=>opt.value===row);if(colOption)colSelect.value=col;if(rowOption)rowSelect.value=row;buildLocCode();},150);}},150);}
+function slotClick(lc){const s=db.samples.find(x=>x.locCode===lc);if(s){showDet(s.id);}else if(confirm('موقعیت '+lc+' خالی است.\nثبت نمونه جدید؟')){fillFormFromLocCode(lc);}}
+
+function renderArch(){
+  const q=(document.getElementById('aq')?document.getElementById('aq').value:'').toLowerCase();
+  const exTb=document.getElementById('arch-ex-tb');
+  const ex=db.archived.filter(s=>!q||s.code.toLowerCase().includes(q)||s.name.toLowerCase().includes(q));
+  exTb.innerHTML=ex.length?ex.map(s=>'<tr onclick="showDet('+s.id+')"><td style="color:var(--p);font-size:8px">'+s.code+'</td><td style="font-size:8px;max-width:50px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+s.name+'</td><td><span class="bdg bg-b">'+s.locCode+'</span></td><td>'+s.exitFloor+'</td><td style="font-size:8px">'+s.exitDate+'</td><td><button class="btn bo bsm" onclick="event.stopPropagation();doPrint(null,'+s.id+',\'arch\')">🖨</button></td></tr>').join(''):'<tr><td colspan="6" style="text-align:center;color:#bbb;padding:10px">خالی</td></tr>';
+}
+
+function renderMoveList(){
+  const q=(document.getElementById('move-search')?document.getElementById('move-search').value:'').toLowerCase();
+  const tb=document.getElementById('move-tb');
+  const items=db.samples.filter(s=>s.movementHistory&&s.movementHistory.length>0);
+  const filtered=items.filter(s=>!q||s.code.toLowerCase().includes(q)||s.name.toLowerCase().includes(q));
+  tb.innerHTML=filtered.length?filtered.map(s=>{
+    const last=s.movementHistory[s.movementHistory.length-1];
+    return '<tr onclick="showDet('+s.id+')"><td style="color:var(--p);font-size:8px">'+s.code+'</td><td style="font-size:8px">'+s.name+'</td><td><span class="bdg bg-b">'+s.locCode+'</span></td><td>'+s.movementHistory.length+'</td><td style="font-size:7px">'+last.from+' → '+last.to+' ('+last.date+')</td></tr>';
+  }).join(''):'<tr><td colspan="5" style="text-align:center;color:#bbb;padding:10px">هیچ جابجایی ثبت نشده</td></tr>';
+}
+
+function renderDeleted(){
+  const q=(document.getElementById('del-search')?document.getElementById('del-search').value:'').toLowerCase();
+  const tb=document.getElementById('del-tb');
+  const items=db.deleted.filter(s=>!q||s.code.toLowerCase().includes(q)||s.name.toLowerCase().includes(q));
+  tb.innerHTML=items.length?items.map(s=>'<tr onclick="showDet('+s.id+')"><td style="color:var(--danger);font-size:8px">'+s.code+'</td><td style="font-size:8px">'+s.name+'</td><td><span class="bdg bg-b">'+s.locCode+'</span></td><td>'+s.exitFloor+'</td><td style="font-size:8px">'+s.deleteDate+'</td></tr>').join(''):'<tr><td colspan="5" style="text-align:center;color:#bbb;padding:10px">خالی</td></tr>';
+}
+
+function findSendSample(){const q=document.getElementById('send-code').value.trim().toLowerCase();const info=document.getElementById('send-sample-info');if(!q){info.style.display='none';return;}const s=db.samples.find(x=>x.code.toLowerCase()===q||x.locCode.toLowerCase()===q)||db.archived.find(x=>x.code.toLowerCase()===q);if(s){info.style.display='block';document.getElementById('send-info-txt').innerHTML='<strong>'+s.code+'</strong> — '+s.name+'<br>موقعیت: <strong>'+s.locCode+'</strong>';info.dataset.sid=s.id;info.dataset.stype=s.status==='active'?'active':'arch';}else{info.style.display='none';alert('نمونه‌ای یافت نشد');}}
+function toggleSendLab(){document.getElementById('send-lab-field').style.display=document.getElementById('send-lab').checked?'block':'none';}
+function doSend(){const info=document.getElementById('send-sample-info');const sid=parseInt(info.dataset.sid),stype=info.dataset.stype;const to=document.getElementById('send-to').value.trim();const isLab=document.getElementById('send-lab').checked;const labName=document.getElementById('send-lab-name').value.trim();const sendAll=document.getElementById('send-all').checked;const date=document.getElementById('send-date').value;const notes=document.getElementById('send-notes').value.trim();if(!to){alert('مقصد را وارد کنید');return;}const src=stype==='active'?db.samples:db.archived;const s=src.find(x=>x.id===sid);if(!s){alert('نمونه یافت نشد');return;}const rec={id:Date.now(),sampleId:sid,sampleCode:s.code,sampleName:s.name,locCode:s.locCode,to,isLab,labName,sendDate:date,notes,sendAll,createdAt:now()};db.sends.push(rec);if(sendAll){if(stype==='active'){const i=db.samples.findIndex(x=>x.id===sid);if(i>-1){const removed=db.samples.splice(i,1)[0];removed.status='sent';removed.sentDate=date;db.archived.push(removed);}}else{const i=db.archived.findIndex(x=>x.id===sid);if(i>-1)db.archived.splice(i,1);}}saveDB();renderSends();updDash();alert('✅ ارسال ثبت شد'+(sendAll?'\nنمونه حذف شد':'\nنمونه باقی ماند'));info.style.display='none';document.getElementById('send-code').value='';document.getElementById('send-to').value='';document.getElementById('send-lab').checked=false;document.getElementById('send-lab-field').style.display='none';document.getElementById('send-lab-name').value='';document.getElementById('send-notes').value='';document.getElementById('send-all').checked=false;}
+function renderSends(){const q=(document.getElementById('send-search').value||'').toLowerCase();const tb=document.getElementById('send-tb');const items=db.sends.filter(r=>!q||r.sampleCode.toLowerCase().includes(q)||r.sampleName.toLowerCase().includes(q)||r.to.toLowerCase().includes(q));tb.innerHTML=items.length?[...items].reverse().map(r=>'<tr onclick="showDet('+r.sampleId+')"><td style="color:var(--p);font-size:8px">'+r.sampleCode+'</td><td style="font-size:8px;max-width:50px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r.sampleName+'</td><td style="font-size:8px">'+r.to+'</td><td style="font-size:8px">'+r.sendDate+'</td><td>'+(r.isLab?'<span class="bdg bg-g">آز</span>':'<span class="bdg bg-b">سایر</span>')+'</td><td>'+(r.sendAll?'<span class="bdg bg-r">کل</span>':'<span class="bdg bg-y">جزئی</span>')+'</td></tr>').join(''):'<tr><td colspan="6" style="text-align:center;color:#bbb;padding:10px">خالی</td></tr>';}
+
+function saveSettings(){db.settings.company=document.getElementById('set-co').value;db.settings.warnDays=parseInt(document.getElementById('set-days').value)||30;saveDB();alert('✅ ذخیره شد');}
+function renderShelfStruct(){const el=document.getElementById('shelf-struct');el.innerHTML=Object.entries(SHELVES).map(([sh,secs])=>{const tot=Object.values(secs).reduce((a,s)=>a+s.c*s.r,0);const occ=db.samples.filter(s=>s.locCode.startsWith(sh+'-')).length;return'<div style="margin-bottom:8px"><div style="font-weight:700;color:var(--p);font-size:10px;margin-bottom:2px">قفسه '+sh+' — '+occ+'/'+tot+'</div>'+Object.entries(secs).map(([sec,d])=>'<div style="font-size:9px;color:#555;padding:1px 5px">• '+SLBL[sec]+': '+d.c+'×'+d.r+' ('+d.c*d.r+')</div>').join('')+'</div>';}).join('');}
+
+function exportExcel(){const ws=XLSX.utils.json_to_sheet(db.samples.map(s=>({'کد نمونه':s.code,'کد موقعیت':s.locCode,'نام نمونه':s.name,'محل نمونه‌برداری':s.location,'نام دپو':s.depot,'شروع دپو':s.dateStart,'پایان دپو':s.dateEnd,'تاریخ نمونه‌برداری':s.dateSample,'تاریخ ورود':s.entryDate,'تست آزمایشگاهی':s.labTest?'بله':'خیر','تست صنعتی':s.indTest?'بله':'خیر','توضیحات':s.notes})));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'نمونه‌ها');const wa=XLSX.utils.json_to_sheet(db.archived.map(s=>({'کد نمونه':s.code,'کد موقعیت':s.locCode,'نام نمونه':s.name,'تاریخ ورود':s.entryDate,'تاریخ خروج':s.exitDate,'طبقه خروج':s.exitFloor})));XLSX.utils.book_append_sheet(wb,wa,'خروج موقت');const ws2=XLSX.utils.json_to_sheet(db.sends.map(r=>({'کد نمونه':r.sampleCode,'نام نمونه':r.sampleName,'ارسال به':r.to,'آزمایشگاه':r.isLab?r.labName:'خیر','تاریخ':r.sendDate,'نوع':r.sendAll?'کل':'جزئی'})));XLSX.utils.book_append_sheet(wb,ws2,'ارسال‌ها');XLSX.writeFile(wb,'MABDA_'+Date.now()+'.xlsx');}
+function dlTemplate(){const headers=[['کد نمونه','کد موقعیت','نام نمونه','محل نمونه‌برداری','نام دپو','شروع دپو','پایان دپو','تاریخ نمونه‌برداری','تاریخ ورود','تست آزمایشگاهی','تست صنعتی','توضیحات'],['','A-K1-1-1','','معدن الف','دپو ۱','۱۴۰۳/۰۱/۰۱','۱۴۰۳/۰۳/۳۱','۱۴۰۳/۰۲/۱۵','۱۴۰۳/۰۶/۲۰','بله','خیر','نمونه آزمایشی']];const ws=XLSX.utils.aoa_to_sheet(headers);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'نمونه‌ها');XLSX.writeFile(wb,'MABDA_Template.xlsx');}
+function importExcel(input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws);
+      let added=0;
+      rows.forEach(row=>{
+        const code=row['کد نمونه']||genCode();
+        if(db.samples.find(s=>s.code===code))return;
+        const toStr=(val)=>val!==undefined&&val!==null?String(val):'';
+        db.samples.push({
+          id:Date.now()+added,
+          code,
+          locCode:row['کد موقعیت']||'',
+          name:row['نام نمونه']||'',
+          location:row['محل نمونه‌برداری']||'',
+          depot:row['نام دپو']||'',
+          dateStart:toStr(row['شروع دپو']),
+          dateEnd:toStr(row['پایان دپو']),
+          dateSample:toStr(row['تاریخ نمونه‌برداری']),
+          entryDate:toStr(row['تاریخ ورود'])||now(),
+          exitFloor:'',
+          labTest:row['تست آزمایشگاهی']==='بله',
+          indTest:row['تست صنعتی']==='بله',
+          notes:row['توضیحات']||'',
+          status:'active',
+          movementHistory:[]
+        });
+        sc++;
+        added++;
+      });
+      saveDB();
+      updDash();
+      alert('✅ '+added+' نمونه با موفقیت وارد شد.');
+    }catch(e){
+      alert('❌ خطا در خواندن فایل Excel: '+e.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  input.value='';
+}
+function exportDB(){const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MABDA_Backup_'+Date.now()+'.json';a.click();}
+function importDB(input){const file=input.files[0];if(!file)return;if(!confirm('دیتابیس فعلی جایگزین می‌شود؟'))return;const reader=new FileReader();reader.onload=e=>{try{db=JSON.parse(e.target.result);sc=db.samples.length+db.archived.length+db.deleted.length+1;saveDB();updDash();alert('✅ بازیابی شد');}catch(e){alert('خطا در JSON');}};reader.readAsText(file);input.value='';}
+
+// QR SCAN
+let html5QrCode=null;
+let qrTimer=null;
+function openScan(target){scanTarget=target;document.getElementById('qr-modal').classList.add('open');document.getElementById('qr-rtxt').textContent='📷 دکمه شروع اسکن';document.getElementById('qr-reader').style.display='block';stopCam();}
+function closeScan(){document.getElementById('qr-modal').classList.remove('open');stopCam();}
+async function startCam(){
+  const qrRtxt=document.getElementById('qr-rtxt');
+  qrRtxt.textContent='⏳ در حال راه‌اندازی...';
+  await stopCam();
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:640},height:{ideal:480}}});
+    const video=document.createElement('video');
+    video.srcObject=stream;
+    video.setAttribute('playsinline','true');
+    video.style.width='100%';video.style.height='auto';video.style.borderRadius='8px';video.style.background='#000';
+    const readerEl=document.getElementById('qr-reader');
+    readerEl.innerHTML='';readerEl.appendChild(video);
+    await video.play();
+    qrRtxt.textContent='🔍 اسکن...';
+    if(window.BarcodeDetector){
+      const bd=new BarcodeDetector({formats:['qr_code']});
+      if(qrTimer)clearInterval(qrTimer);
+      qrTimer=setInterval(async()=>{
+        try{
+          if(video.readyState<2)return;
+          const barcodes=await bd.detect(video);
+          if(barcodes.length>0){clearInterval(qrTimer);qrTimer=null;handleScan(barcodes[0].rawValue);}
+        }catch(e){}
+      },300);
+    }else{
+      video.pause();video.srcObject.getTracks().forEach(t=>t.stop());readerEl.innerHTML='';throw new Error('BarcodeDetector not supported');
+    }
+  }catch(err){
+    qrRtxt.textContent='🔄 روش جایگزین...';
+    document.getElementById('qr-reader').innerHTML='';
+    html5QrCode=new Html5Qrcode("qr-reader");
+    const config={fps:15,formatsToSupport:[Html5QrcodeSupportedFormats.QR_CODE]};
+    try{
+      await html5QrCode.start({facingMode:"environment"},config,handleScan,()=>{});
+      qrRtxt.textContent='🔍 دوربین روشن شد.';
+    }catch(err2){
+      try{
+        await html5QrCode.start({facingMode:"user"},config,handleScan,()=>{});
+        qrRtxt.textContent='🔍 دوربین جلو روشن شد.';
+      }catch(err3){
+        qrRtxt.textContent='❌ خطا: دسترسی به دوربین ممکن نیست.';
+        html5QrCode=null;
+      }
+    }
+  }
+}
+async function stopCam(){
+  if(qrTimer){clearInterval(qrTimer);qrTimer=null;}
+  if(html5QrCode){try{await html5QrCode.stop();await html5QrCode.clear();}catch(e){}html5QrCode=null;}
+  const readerEl=document.getElementById('qr-reader');
+  const video=readerEl.querySelector('video');
+  if(video){if(video.srcObject){video.srcObject.getTracks().forEach(t=>t.stop());}video.pause();video.srcObject=null;readerEl.innerHTML='';}
+}
+function handleScan(decodedText,decodedResult){
+  stopCam();
+  document.getElementById('qr-rtxt').textContent='✅ کد: '+decodedText;
+  setTimeout(()=>closeScan(),500);
+  if(scanTarget==='loc'){document.getElementById('f-loccode').value=decodedText;parseLocCode();}
+  else if(scanTarget==='list-search'){document.getElementById('fl-q').value=decodedText;renderList();}
+  else if(scanTarget==='s-code'){document.getElementById('s-code').value=decodedText;searchCode();}
+  else if(scanTarget==='s-loc'){document.getElementById('s-loc').value=decodedText;searchLoc();}
+  else if(scanTarget==='mv-loc'){document.getElementById('mv-loc').value=decodedText;}
+  else if(scanTarget==='send-code'){document.getElementById('send-code').value=decodedText;findSendSample();}
+  else if(scanTarget==='send-search-scan'){document.getElementById('send-search').value=decodedText;renderSends();}
+  else if(scanTarget==='arch-search'){document.getElementById('aq').value=decodedText;renderArch();}
+  else if(scanTarget==='del-search'){document.getElementById('del-search').value=decodedText;renderDeleted();}
+  else if(scanTarget==='move-search'){document.getElementById('move-search').value=decodedText;renderMoveList();}
+}
+
+async function openPrintPreview(sample){
+  if(!sample)return;
+  printingSample=sample;
+  let l2=(sample.location&&sample.depot)?`${sample.location} - ${sample.depot}`:(sample.location||sample.depot||'نامشخص');
+  let l3=(sample.dateStart&&sample.dateEnd)?`از ${sample.dateStart} الی ${sample.dateEnd}`:(sample.dateStart||sample.dateEnd||sample.dateSample||'تاریخ ثبت نشده');
+  document.getElementById('lbl-line2').textContent=l2;
+  document.getElementById('lbl-line3').textContent=l3;
+  document.getElementById('lbl-code').textContent=sample.code;
+  document.getElementById('lbl-loc').textContent=sample.locCode;
+  ['label-qr-sample','label-qr-loc','r-qr-loc','r-qr-code'].forEach(id=>{document.getElementById(id).innerHTML='';});
+  try{
+    new QRCode(document.getElementById('label-qr-sample'),{text:sample.code,width:94,height:94,colorDark:"#000000",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.H});
+    new QRCode(document.getElementById('label-qr-loc'),{text:sample.locCode,width:94,height:94,colorDark:"#000000",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.H});
+    new QRCode(document.getElementById('r-qr-loc'),{text:sample.locCode,width:110,height:110,colorDark:"#000000",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.H});
+    new QRCode(document.getElementById('r-qr-code'),{text:sample.code,width:110,height:110,colorDark:"#000000",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.H});
+  }catch(e){console.warn('QR error:',e);}
+  const popup=document.getElementById('print-popup');
+  const isPortrait=window.innerHeight>window.innerWidth;
+  popup.style.transform=isPortrait?'rotate(-90deg)':'none';
+  popup.style.transformOrigin='center center';
+  document.getElementById('print-modal').classList.add('open');
+  await new Promise(resolve=>setTimeout(resolve,400));
+}
+async function confirmPrint(){
+  const labelRow=document.getElementById('label-row');
+  const sample=printingSample;
+  if(!labelRow||!sample){alert('خطا در یافتن لیبل یا نمونه');return;}
+  try{
+    const popup=document.getElementById('print-popup');
+    const prevT=popup.style.transform;
+    popup.style.transform='none';
+    await new Promise(r=>setTimeout(r,120));
+    const canvas=await html2canvas(labelRow,{scale:3.779,useCORS:true,backgroundColor:'#ffffff',width:labelRow.scrollWidth,height:labelRow.scrollHeight});
+    popup.style.transform=prevT;
+    const {jsPDF}=window.jspdf;
+    const W=10+0.5+3.5+0.3+3.5;
+    const H=4.4;
+    const doc=new jsPDF({orientation:'landscape',unit:'cm',format:[W,H]});
+    const imgData=canvas.toDataURL('image/png');
+    doc.addImage(imgData,'PNG',0.2,0.2,W-0.4,H-0.4);
+    doc.save('MABDA_'+sample.code+'.pdf');
+    closeModal('print-modal');
+  }catch(err){
+    console.error('Print Error:',err);
+    alert('⚠️ خطا در تولید پرینت: '+err.message);
+  }
+}
+async function doPrint(sample,id,src,fromForm){
+  if(!sample&&id){if(src==='arch')sample=db.archived.find(x=>x.id===id);else sample=db.samples.find(x=>x.id===id)||db.archived.find(x=>x.id===id)||db.deleted.find(x=>x.id===id);}
+  if(!sample&&fromForm){
+    const loc=document.getElementById('f-loc').value.trim();const dep=document.getElementById('f-depot').value.trim();
+    const ds=document.getElementById('f-ds').value.trim();const de=document.getElementById('f-de').value.trim();
+    const code=document.getElementById('f-code').value;const locCode=document.getElementById('f-loccode').value.trim();
+    if(!code||!locCode){alert('⚠️ ابتدا نمونه را ثبت کنید');return;}
+    sample={code,locCode,name:document.getElementById('f-name').value.trim()||(loc+' - '+dep+' از '+ds),location:loc,depot:dep,dateStart:ds,dateEnd:de,dateSample:document.getElementById('f-dsample').value.trim(),entryDate:document.getElementById('f-entry').value||now(),notes:document.getElementById('f-notes').value.trim(),labTest:document.getElementById('f-lab').checked,indTest:document.getElementById('f-ind').checked,status:'active'};
+  }
+  if(!sample){alert('⚠️ نمونه‌ای برای پرینت انتخاب نشده');return;}
+  await openPrintPreview(sample);
+}
+
+function splashPromise(){
+  return new Promise((resolve)=>{
+    const txt='بخش فنی و مهندسی مبدا';const el=document.getElementById('spl-sub');
+    if(!el){const splash=document.getElementById('splash');if(splash){splash.classList.add('hide');setTimeout(()=>{splash.style.display='none';resolve();},500);}else resolve();return;}
+    let i=0;const start=Date.now();
+    const interval=setInterval(()=>{el.textContent=txt.slice(0,i++);if(i>txt.length){clearInterval(interval);const remaining=Math.max(0,2000-(Date.now()-start));setTimeout(()=>{const splash=document.getElementById('splash');if(splash){splash.classList.add('hide');setTimeout(()=>{splash.style.display='none';resolve();},1000);}else resolve();},remaining);}},70);
+    setTimeout(()=>{const splash=document.getElementById('splash');if(splash&&splash.style.display!=='none'){clearInterval(interval);splash.classList.add('hide');setTimeout(()=>{splash.style.display='none';resolve();},1000);}},4000);
+  });
+}
+
+async function initApp(){try{loadDB();updDash();await splashPromise();if('serviceWorker' in navigator){try{await navigator.serviceWorker.register('./sw.js');console.log('✅ Service Worker registered');}catch(err){console.log('⚠️ Service Worker registration failed:',err);}}}catch(err){console.error('Init error:',err);const splash=document.getElementById('splash');if(splash){splash.classList.add('hide');setTimeout(()=>splash.style.display='none',500);}}}
+initApp();
+</script>
+</body>
+</html>
